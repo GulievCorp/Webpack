@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webpack</title>
+    <script src="./analytics.js"></script>
+</head>
+
+<body>
+
+    <div class="conatiner">
+        <h1>Webpack</h1>
+    </div>
+
+    <p>Первым делом нужно сделать npm init</p>
+    <p>Потому нужно установить вэбпак этой командой npm install -D webpack webpack-cli</p>
+    <p>-D это значит что мы сохраняем данные зависимости только для разработки. То есть мы пользуемся вэбпаком только во
+        время разработки</p>
+    <p>Теперь в package.json есть devDependencies. И там два пакета webpack и webpack cli</p>
+
+    <h2>Настройка вэбпака</h2>
+    <p>Мы можем настраивать вэбпак через консоль</p>
+    <p>Например мы можем написать webpack ./src/index.js итд</p>
+
+    <p>Боллее правильно настраивать вэбпак через файл webpack.config.js</p>
+    <p>Webpack config js инструмент для сборки который интерптерируется как node js</p>
+
+    <p>Учитывая наше множество файлов у нас есть две точки входа index.js</p>
+
+    <h2>Что написанно в файле webpack.config.js</h2>
+    <p>entry точка входа</p>
+    <p>output это точка выхода, когда js соберет все файлы мы получим один файл который называется bundle.js</p>
+    <p>path показывает куда мы кладем весь bundle, и как называем папку. для этого мы используем метод path который находится выше.</p>
+    <b>Так же что бы все заработало мы добавляем в package.json в scriptes свойство "build": "webpack"</b>
+    <br>
+    <b>И запускаем наш проект с помощью npm run build</b>
+    <p>Mode параметр режим, в нем мы указываем мод для сборки development production test итд</p>
+
+    <h2>Далее</h2>
+    <p>Webpack нам создал папку dist с файлом main.js</p>
+    <p>В нем как раз написанна наша программа, но она минифицированна.</p>
+    <p>Так же вэбпак в консоли выкинул ошибку, в которой написал что в конфигурации не был установлен mode</p>
+    <p>Поэтому вэбпак собрал нам всё в моде продакшн</p>
+    <p>Теперь напишем в webpack config mode и напишем значение development</p>
+
+    <script src="Post.js"></script>
+    <script src="index.js"></script>
+
+</body>
+
+</html>
