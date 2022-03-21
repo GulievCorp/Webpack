@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webpack</title>
+    <script src="./alatytics.bundle.js"></script>
+</head>
+
+<body>
+
+    <div class="conatiner">
+        <h1>Webpack</h1>
+    </div>
+
+    <p>Первым делом нужно сделать npm init</p>
+    <p>Потому нужно установить вэбпак этой командой npm install -D webpack webpack-cli</p>
+    <p>-D это значит что мы сохраняем данные зависимости только для разработки. То есть мы пользуемся вэбпаком только во
+        время разработки</p>
+    <p>Теперь в package.json есть devDependencies. И там два пакета webpack и webpack cli</p>
+
+    <h2>Настройка вэбпака</h2>
+    <p>Мы можем настраивать вэбпак через консоль</p>
+    <p>Например мы можем написать webpack ./src/index.js итд</p>
+
+    <p>Боллее правильно настраивать вэбпак через файл webpack.config.js</p>
+    <p>Webpack config js инструмент для сборки который интерптерируется как node js</p>
+
+    <p>Учитывая наше множество файлов у нас есть две точки входа index.js</p>
+
+    <h2>Что написанно в файле webpack.config.js</h2>
+    <p>entry точка входа</p>
+    <p>output это точка выхода, когда js соберет все файлы мы получим один файл который называется bundle.js</p>
+    <p>path показывает куда мы кладем весь bundle, и как называем папку. для этого мы используем метод path который
+        находится выше.</p>
+    <b>Так же что бы все заработало мы добавляем в package.json в scriptes свойство "build": "webpack"</b>
+    <br>
+    <b>И запускаем наш проект с помощью npm run build</b>
+    <p>Mode параметр режим, в нем мы указываем мод для сборки development production test итд</p>
+
+    <h2>Далее</h2>
+    <p>Webpack нам создал папку dist с файлом main.js</p>
+    <p>В нем как раз написанна наша программа, но она минифицированна.</p>
+    <p>Так же вэбпак в консоли выкинул ошибку, в которой написал что в конфигурации не был установлен mode</p>
+    <p>Поэтому вэбпак собрал нам всё в моде продакшн</p>
+    <p>Теперь напишем в webpack config mode и напишем значение development</p>
+
+    <h2>Теперь</h2>
+    <p>Теперь мы можем экспортировать по дефолту и импортировать наши функции классы итд</p>
+    <p>У нас теперь есть js который собран в один файл bundle.js</p>
+    <p>Webpack соединяет все скрипты в один. Теперь мы можем не думать о порядке подключения скриптов</p>
+
+    <h2>Переносим index.html в dist</h2>
+    <p>Теперь мы переносим наш html. И он подключается всего одним скриптом bundle.js. Можно посмотреть ниже</p>
+
+    <h2>Что же делать с аналитикой ?</h2>
+    <p>Предположим что index.js, post.js это один скрипт, а analytics совершенно другой скрипт</p>
+    <p>Сейчас консоль ругается на то что мы не имеем доступа до alatytics.js</p>
+    <p>До этого мы указывали в entry одну точку входа вот так entry: './src/index.js'</p>
+    <p>Теперь мы укажем несколько точек входа с помощью обьекта в который мы поместим</p>
+    <p>main: './src/index.js',</p>
+    <p>alatytics: './src/alatytics.js'</p>
+    <p>Main и analytics являются chunk, main имеет сразу два файла, index и post и пытаются совместится в bundle </p>
+    <p>Если мы сейчас запустим вэбпак он будет ругаться</p>
+    <b>Он скажет нам о конфликте - то что несколько фрагментов отправляют активы в файл с одним и тем же именем
+        bundle.js</b>
+    <br>
+    <b>Error: Conflict: Multiple chunks emit assets to the same filename bundle.js (chunks main and alatytics</b>
+    <p>В этом случае мы можем использовать патерны имен, в output</p>
+    <p>output: {</p>
+    <p>filename: '[name].bundle.js',</p>
+    <p>path: path.resolve(__dirname, 'dist')</p>
+    <p>},</p>
+    <p>Именно в filename мы указали перед bundle [name] который является динамическим.</p>
+    <br>
+    <b>Теперь если мы запустим Webpack сгенируется два файла main.bundle.js и alatytics.bundle.js</b>
+    <p>Теперь подключаем наши два файла, main.bundle js снизу, а analytics.bundle сверху</p>
+
+
+
+    <script src="./main.bundle.js"></script>
+
+</body>
+
+</html>
