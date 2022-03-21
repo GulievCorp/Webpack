@@ -78,7 +78,52 @@
     <b>Теперь если мы запустим Webpack сгенируется два файла main.bundle.js и alatytics.bundle.js</b>
     <p>Теперь подключаем наши два файла, main.bundle js снизу, а analytics.bundle сверху</p>
 
+    <h2>Что имеем сейчас</h2>
+    <pre>
+const path = require('path');
 
+module.exports = {
+    entry: {
+        main: './src/index.js',
+        alatytics: './src/analytics.js'
+    },
+    output: {
+        filename: '[name].bundle.js',
+        path: path.resolve(__dirname, 'dist')
+    },
+    'mode': 'development'
+}
+    </pre>
+    <ul>
+        <li>У нас есть режим разработки</li>
+        <li>Мы имеем две точки входа в entry</li>
+        <li>Они собираются в единый файл с фиксированным значением в output</li>
+    </ul>
+
+    <h2>У нас есть некоторые проблемы</h2>
+    <p>Проблемы с кэшем например мы что то изменем в одном из файлов, и по итогу у нас будут такие же названия файлов итд. Браузер закжширует все и пользователь не увидит изменений</p>
+    <p>Для этого мы будем использовать еще один патерн названия он будет динамически отоброжать еще и bundle</p>
+
+    <pre>
+const path = require('path');
+
+module.exports = {
+    entry: {
+        main: './src/index.js',
+        alatytics: './src/analytics.js'
+    },
+    output: {
+        filename: '[name].[contenthash].js',
+        path: path.resolve(__dirname, 'dist')
+    },
+    'mode': 'development'
+}
+    </pre>
+    <p>Мы обернули наше название bundle, и назвали его contenthash</p>
+    <b>Запускаем вэбпак и теперь наши файлы имеют названия alatytics.410996a2a9a1bab0063f и main.8e68f6fd050c144fcfed</p>
+    <p>Теперь если мы изменим наш файл все изменения будут действовать то у файла с имзенением будет создаваться новый файл</p>
+    <b>Из этого появляется новая проблема</b>
+    <p>Непонятно какой файл актуальный</p>
 
     <script src="./main.bundle.js"></script>
 
