@@ -1,6 +1,6 @@
 function createAnalytics() {
     let counter = 0;
-    let isDestoryed = false
+    let destoryed = false
 
     const listener = () => counter++
 
@@ -9,10 +9,10 @@ function createAnalytics() {
     return {
         destroy() {
             document.removeEventListener('click', listener);
-            isDestoryed = true;
+            destoryed = true;
         },
         getClicks() {
-            if(isDestoryed){
+            if(destoryed){
                 return `Alaytics is destroyed. Total clicks = ${counter}`
             }
             return counter

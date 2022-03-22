@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webpack</title>
+</head>
+
+<body>
+
+    <div class="conatiner">
+        <h1>Webpack</h1>
+    </div>
+
+    <p>Первым делом нужно сделать npm init</p>
+    <p>Потому нужно установить вэбпак этой командой npm install -D webpack webpack-cli</p>
+    <p>-D это значит что мы сохраняем данные зависимости только для разработки. То есть мы пользуемся вэбпаком только во
+        время разработки</p>
+    <p>Теперь в package.json есть devDependencies. И там два пакета webpack и webpack cli</p>
+
+    <h2>Настройка вэбпака</h2>
+    <p>Мы можем настраивать вэбпак через консоль</p>
+    <p>Например мы можем написать webpack ./src/index.js итд</p>
+
+    <p>Боллее правильно настраивать вэбпак через файл webpack.config.js</p>
+    <p>Webpack config js инструмент для сборки который интерптерируется как node js</p>
+
+    <p>Учитывая наше множество файлов у нас есть две точки входа index.js</p>
+
+    <h2>Что написанно в файле webpack.config.js</h2>
+    <p>entry точка входа</p>
+    <p>output это точка выхода, когда js соберет все файлы мы получим один файл который называется bundle.js</p>
+    <p>path показывает куда мы кладем весь bundle, и как называем папку. для этого мы используем метод path который
+        находится выше.</p>
+    <b>Так же что бы все заработало мы добавляем в package.json в scriptes свойство "build": "webpack"</b>
+    <br>
+    <b>И запускаем наш проект с помощью npm run build</b>
+    <p>Mode параметр режим, в нем мы указываем мод для сборки development production test итд</p>
+
+    <h2>Далее</h2>
+    <p>Webpack нам создал папку dist с файлом main.js</p>
+    <p>В нем как раз написанна наша программа, но она минифицированна.</p>
+    <p>Так же вэбпак в консоли выкинул ошибку, в которой написал что в конфигурации не был установлен mode</p>
+    <p>Поэтому вэбпак собрал нам всё в моде продакшн</p>
+    <p>Теперь напишем в webpack config mode и напишем значение development</p>
+
+    <h2>Теперь</h2>
+    <p>Теперь мы можем экспортировать по дефолту и импортировать наши функции классы итд</p>
+    <p>У нас теперь есть js который собран в один файл bundle.js</p>
+    <p>Webpack соединяет все скрипты в один. Теперь мы можем не думать о порядке подключения скриптов</p>
+
+    <h2>Переносим index.html в dist</h2>
+    <p>Теперь мы переносим наш html. И он подключается всего одним скриптом bundle.js. Можно посмотреть ниже</p>
+
+    <h2>Что же делать с аналитикой ?</h2>
+    <p>Предположим что index.js, post.js это один скрипт, а analytics совершенно другой скрипт</p>
+    <p>Сейчас консоль ругается на то что мы не имеем доступа до alatytics.js</p>
+    <p>До этого мы указывали в entry одну точку входа вот так entry: './src/index.js'</p>
+    <p>Теперь мы укажем несколько точек входа с помощью обьекта в который мы поместим</p>
+    <p>main: './src/index.js',</p>
+    <p>alatytics: './src/alatytics.js'</p>
+    <p>Main и analytics являются chunk, main имеет сразу два файла, index и post и пытаются совместится в bundle </p>
+    <p>Если мы сейчас запустим вэбпак он будет ругаться</p>
+    <b>Он скажет нам о конфликте - то что несколько фрагментов отправляют активы в файл с одним и тем же именем
+        bundle.js</b>
+    <br>
+    <b>Error: Conflict: Multiple chunks emit assets to the same filename bundle.js (chunks main and alatytics</b>
+    <p>В этом случае мы можем использовать патерны имен, в output</p>
+    <p>output: {</p>
+    <p>filename: '[name].bundle.js',</p>
+    <p>path: path.resolve(__dirname, 'dist')</p>
+    <p>},</p>
+    <p>Именно в filename мы указали перед bundle [name] который является динамическим.</p>
+    <br>
+    <b>Теперь если мы запустим Webpack сгенируется два файла main.bundle.js и alatytics.bundle.js</b>
+    <p>Теперь подключаем наши два файла, main.bundle js снизу, а analytics.bundle сверху</p>
+
+    <h2>Что имеем сейчас</h2>
+    <pre>
+const path = require('path');
+
+module.exports = {
+    entry: {
+        main: './src/index.js',
+        alatytics: './src/analytics.js'
+    },
+    output: {
+        filename: '[name].bundle.js',
+        path: path.resolve(__dirname, 'dist')
+    },
+    'mode': 'development'
+}
+    </pre>
+    <ul>
+        <li>У нас есть режим разработки</li>
+        <li>Мы имеем две точки входа в entry</li>
+        <li>Они собираются в единый файл с фиксированным значением в output</li>
+    </ul>
+
+    <h2>У нас есть некоторые проблемы</h2>
+    <p>Проблемы с кэшем например мы что то изменем в одном из файлов, и по итогу у нас будут такие же названия файлов
+        итд. Браузер закжширует все и пользователь не увидит изменений</p>
+    <p>Для этого мы будем использовать еще один патерн названия он будет динамически отоброжать еще и bundle</p>
+
+    <pre>
+const path = require('path');
+
+module.exports = {
+    entry: {
+        main: './src/index.js',
+        alatytics: './src/analytics.js'
+    },
+    output: {
+        filename: '[name].[contenthash].js',
+        path: path.resolve(__dirname, 'dist')
+    },
+    'mode': 'development'
+}
+    </pre>
+    <p>Мы обернули наше название bundle, и назвали его contenthash</p>
+    <b>Запускаем вэбпак и теперь наши файлы имеют названия alatytics.410996a2a9a1bab0063f и main.8e68f6fd050c144fcfed
+        </p>
+        <p>Теперь если мы изменим наш файл все изменения будут действовать то у файла с имзенением будет создаваться
+            новый файл</p>
+        <b>Из этого появляется новая проблема</b>
+        <p>Непонятно какой файл актуальный</p>
+
+        <h2>Как работать с документацией и что в ней присутствует</h2>
+        <p>В поле documentation/configuration есть разные поля настроек.</p>
+        <p>Например в filename перечислены разные патерны.</p>
+
+
+        <h2>Еще проблемы</h2>
+        <p>Так как index.html не знает в каком порядке нам подключать скрипты, мы будем ипользовать плагины.</p>
+        <p><b>Плагины это доп функционал в виде классов который мы можем добавлять к базовой конфигурации вэбпак</b></p>
+        <p>Плагины устанавливаются дополнительно к проекту</p>
+        <p>Самым популярным плагином является html-webpack-plugin</p>
+        <p>Установим его командой npm install -D html-webpack-plugin сохранив dev зависимости</p>
+
+        <h2>HTML-WEBPACK-PLUGIN</h2>
+        <p>Данный плагин позволяет вэбпаку работать с html</p>
+        <p>Подключим его через require и добавим новое свойство plugins в webpack</p>
+        <pre>
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+    entry: {
+        main: './src/index.js',
+        alatytics: './src/analytics.js'
+    },
+    output: {
+        filename: '[name].[contenthash].js',
+        path: path.resolve(__dirname, 'dist')
+    },
+    plugins: [
+        new HtmlWebpackPlugin()
+    ],
+    'mode': 'development'
+}
+    </pre>
+        <p>Теперь переносим наш index.html обратно в src. И запускаме наш проект</p>
+        <p>Таким образом у нас сгенирируется index.html в папке dist</p>
+        <p>Так же мы можем в этот класс передавать набор опций вот так</p>
+        <pre>
+        plugins: [
+        new HtmlWebpackPlugin({
+            title: 'Webpack Guliev'
+        })
+    </pre>
+        <p>Теперь в index.html измениться title</p>
+
+        <h2>Модифицируем html в папке src</h2>
+        <p>Удаляем теперь с index.html скрипты, потому что они и так подключаются нам как нужно</p>
+        <p>В нужном порядке</p>
+        <p>Для того что бы у нас на странице появился контент, в плагинах нам нужно указать свойсвто template с путем до
+            нашего index.html в src</p>
+        <pre>
+            const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+    entry: {
+        main: './src/index.js',
+        alatytics: './src/analytics.js'
+    },
+    output: {
+        filename: '[name].[contenthash].js',
+        path: path.resolve(__dirname, 'dist')
+    },
+    plugins: [
+        new HtmlWebpackPlugin({
+            title: 'Webpack Guliev',
+            template: './src/index.html'
+        })
+    ],
+    'mode': 'development'
+}
+        </pre>
+
+        <h2>Clean-webpack-plugin Как очищать папку dist от прошлых сборок</h2>
+        <p>Для этого нам потребуется установить еще один плагин Clean-webpack-plugin</p>
+        <p>npm install -D clean-webpack-plugin</p>
+        <p>Теперь добавляем его в вэбпак с помощью require</p>
+        <p>И прописываем его через webpack в плагинах</p>
+        <pre>
+            const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+
+module.exports = {
+    entry: {
+        main: './src/index.js',
+        alatytics: './src/analytics.js'
+    },
+    output: {
+        filename: '[name].[contenthash].js',
+        path: path.resolve(__dirname, 'dist')
+    },
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: './src/index.html'
+        }),
+        new CleanWebpackPlugin()
+    ],
+    'mode': 'development'
+}
+        </pre>
+        <p>Теперь при каждом npm run build лишние файлы будут удаляться</p>
+
+        <h2>Сборка проекта</h2>
+        <p>В файле package.json помимо списка зависимости есть еще свойство scripts</p>
+        <p>Мы можем модифицировать её для того что бы прописыватьк команды что бы управлять проектом например как наш
+            npm run build</p>
+        <pre>
+            "scripts": {
+                "test": "echo \"Error: no test specified\" && exit 1",
+                "build": "webpack --mode production",
+                "dev": "webpack --mode develpopment"
+              },
+        </pre>
+        <p>Теперь build собирает проект в моде продакшн и наш код не минифицирован так же в файлах нету конфигурации</p>
+        <p>Dev - собирает проект с минифицированными скриптами</p>
+
+        <h2>Контекст</h2>
+        <p>Это обычная строчка которая говорит нам где лежат все исходники нашего приложения</p>
+        <p>И теперь нам не нужно в каждом свойстве прописывать путь до файла</p>
+        <pre>
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+
+module.exports = {
+    context: path.resolve(__dirname, 'src'),
+    entry: {
+        main: './index.js',
+        alatytics: './analytics.js'
+    },
+    output: {
+        filename: '[name].[contenthash].js',
+        path: path.resolve(__dirname, 'dist')
+    },
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: './index.html'
+        }),
+        new CleanWebpackPlugin()
+    ],
+    'mode': 'development'
+}
+        </pre>
+
+        <h2>CSS and Loader</h2>
+        <p class="red">Webpack понимает только JS и JSON.</p>
+        <p>Первым делом нам нужно импортировать наш css в главный js файл</p>
+        <p>Помимо плагинов в вэбпаке есть еще и лоадеры</p>
+        <p>Лоадер добавляет вэбпаку функционал работать не только в вэбпаком, например с css</p>
+        <p>Для лоадеров мы пишем модуль moduel который принимает массив правил, в которых уже находятся обьекты с правилами</p>
+        <p>В данном случае мы в обьекте пишем test с значением /\.css$/</p>
+        <p>Это значит что если Webpack встерит css файлы то он будет использовать лоадер который находится в use</p>
+        <p>В use мы в масиве перечисляем наши лоадеры которые работают слева направо.</p>
+        <p>В нашем случае он будет пропускать все из css loader в style loader</p>
+        <p>Css loader позволяет вэбпаку понимать импорты как у нас в index.js</p>
+        <p>Style loader он добавляет стили css в секцию head в html</p>
+        <br>
+        <b>Но нам нужно так же установить два этих пакета</b>
+        <br>
+        <b>npm install - style-loader css-loader</b>
+        <p>В итоге css теперь подключен</p>
+
+</body>
+
+</html>
