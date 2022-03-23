@@ -122,8 +122,7 @@ module.exports = {
     <p>Мы обернули наше название bundle, и назвали его contenthash</p>
     <b>Запускаем вэбпак и теперь наши файлы имеют названия alatytics.410996a2a9a1bab0063f и main.8e68f6fd050c144fcfed
         </p>
-        <p>Теперь если мы изменим наш файл все изменения будут действовать то у файла с имзенением будет создаваться
-            новый файл</p>
+        <p>Теперь если мы изменим наш файл все изменения будут действовать то у файла с имзенением будет создаватьсяновый файл</p>
         <b>Из этого появляется новая проблема</b>
         <p>Непонятно какой файл актуальный</p>
 
@@ -290,6 +289,41 @@ module.exports = {
         <b>npm install - style-loader css-loader</b>
         <p>В итоге css теперь подключен</p>
 
+        
+        <h2>Другие типы Loader</h2>
+        <p>Пример с нашим json который находится в assets</p>
+        <p>В вэбпаке что бы использовать его мы можем написать просто импорт нашего json</p>
+        <p>Вэбпак по умолчанию понимает это</p>
+        <pre>
+            import Post from "./Post";
+import json from '../assets/json.json';
+import './styles/styles.css';
+
+console.log(json);
+
+const post = new Post('Webpack Post Title');
+
+console.log('Post to string:', post.toString());
+        </pre>
+        <p>Теперь в консоли выводится наш json</p>
+
+        <h2>Если мы не хотим каждый раз собирать проект</h2>
+        <p>Для этого в package.json нам нужно добавить watch</p>
+        <p class="red">"watch": "webpack --mode development --watch"</p>
+        <p>Добавляем его в scripts</p>
+        <p>Он будет следить за каждым изменением</p>
+        <p>Но для этого мы должны установить watch</p>
+        <p class="red">npm install npm-watch</p>
+        <pre>
+            "scripts": {
+                "test": "echo \"Error: no test specified\" && exit 1",
+                "build": "webpack --mode production",
+                "dev": "webpack --mode development",
+                "watch": "webpack --mode development --watch"
+              },
+        </pre>
+        <p>Теперь запускаем наш проект с помощью npm run watch</p>
+        <p>И при каждом сохранении нашего файла, сайт будет обновляться</p>
 </body>
 
 </html>
