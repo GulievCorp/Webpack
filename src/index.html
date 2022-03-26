@@ -122,7 +122,8 @@ module.exports = {
     <p>Мы обернули наше название bundle, и назвали его contenthash</p>
     <b>Запускаем вэбпак и теперь наши файлы имеют названия alatytics.410996a2a9a1bab0063f и main.8e68f6fd050c144fcfed
         </p>
-        <p>Теперь если мы изменим наш файл все изменения будут действовать то у файла с имзенением будет создаватьсяновый файл</p>
+        <p>Теперь если мы изменим наш файл все изменения будут действовать то у файла с имзенением будет
+            создаватьсяновый файл</p>
         <b>Из этого появляется новая проблема</b>
         <p>Непонятно какой файл актуальный</p>
 
@@ -276,7 +277,8 @@ module.exports = {
         <p>Первым делом нам нужно импортировать наш css в главный js файл</p>
         <p>Помимо плагинов в вэбпаке есть еще и лоадеры</p>
         <p>Лоадер добавляет вэбпаку функционал работать не только в вэбпаком, например с css</p>
-        <p>Для лоадеров мы пишем модуль moduel который принимает массив правил, в которых уже находятся обьекты с правилами</p>
+        <p>Для лоадеров мы пишем модуль moduel который принимает массив правил, в которых уже находятся обьекты с
+            правилами</p>
         <p>В данном случае мы в обьекте пишем test с значением /\.css$/</p>
         <p>Это значит что если Webpack встерит css файлы то он будет использовать лоадер который находится в use</p>
         <p>В use мы в масиве перечисляем наши лоадеры которые работают слева направо.</p>
@@ -289,7 +291,7 @@ module.exports = {
         <b>npm install - style-loader css-loader</b>
         <p>В итоге css теперь подключен</p>
 
-        
+
         <h2>Другие типы Loader</h2>
         <p>Пример с нашим json который находится в assets</p>
         <p>В вэбпаке что бы использовать его мы можем написать просто импорт нашего json</p>
@@ -324,6 +326,182 @@ console.log('Post to string:', post.toString());
         </pre>
         <p>Теперь запускаем наш проект с помощью npm run watch</p>
         <p>И при каждом сохранении нашего файла, сайт будет обновляться</p>
+
+        <h2>Работа с картинками</h2>
+
+        <p>Импортируем нашу картинку в файл index.js</p>
+        <p>Прокидываем её в наш post.</p>
+        <p>Прописываем её в конструкторе. И делаем обращение к ней в методе stringfly</p>
+        <p class="red">Здесь мы импортировали и прокинули</p>
+        <pre>
+            import Post from "./Post";
+import json from '../assets/json.json';
+import './styles/styles.css';
+import Pepe from '../assets/pepe.jpg'
+
+console.log(json);
+
+const post = new Post('Webpack Post Title', Pepe);
+
+console.log('Post to string:', post.toString());
+        </pre>
+        <p class="red">А здесь мы уже используем нашу картинку</p>
+        <pre>
+            export default class Post {
+                constructor(title, img) {
+                    this.title = title;
+                    this.img = img
+                    this.date = new Date();
+                }
+            
+                toString() {
+                    return JSON.stringify({
+                        title: this.title,
+                        date: this.date.toJSON(),
+                        img: this.img
+                    })
+                }
+            
+                get upperCaseTitle(){
+                    return this.title.toUpperCase()
+                }
+            }
+        </pre>
+
+        <p>Но теперь вэбпак нам выдаст ошибку потому что он не знает о формате jpg</p>
+        <p>Теперь нам нужно установить новый тип лоадера который поможет нам с ним взаимодействовать</p>
+        <p class="red">npm install -D file-loader</p>
+        <p>Данный лоадер позволяет нам работать с различными файлами. И картинками</p>
+
+        <p>Теперь прописываем правила использование нашего loadera в webpack config</p>
+        <pre>
+            {
+                test: /\.(png|jpg|svg|gif)$/,
+                use: ['file-loader']
+            }
+        </pre>
+        <p class="red">А так теперь выглядит весь наш файл</p>
+        <pre>
+            const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+
+module.exports = {
+    context: path.resolve(__dirname, 'src'),
+    entry: {
+        main: './index.js',
+        alatytics: './analytics.js'
+    },
+    output: {
+        filename: '[name].[contenthash].js',
+        path: path.resolve(__dirname, 'dist')
+    },
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: './index.html'
+        }),
+        new CleanWebpackPlugin()
+    ],
+    module: {
+        rules: [
+            {
+                test: /\.css$/,
+                use: ['style-loader', 'css-loader']
+            },
+            {
+                test: /\.(png|jpg|svg|gif)$/,
+                use: ['file-loader']
+            }
+        ]
+    },
+    'mode': 'development'
+}
+        </pre>
+        <p>И вот наша картинка</p>
+        <img src="" alt="" class="pepe">
+
+        <h2>Файл лоадер и работа с шрифтами</h2>
+        <p>Скачиваем шрифт</p>
+        <p>Создаем папку Fonts в assets и кидаем туда наш шрифт</p>
+        <p>Далее создаем файл roboto.css в папке styles</p>
+        <pre>
+            @font-face {
+                font-family: 'Roboto';
+                src: url('../../assets//Fonts/Roboto-Regular.ttf') format('truetype');
+            }
+        </pre>
+        <p>Пишем такой css стиль</p>
+        <p>Далее пишем правила для нашего вэбпака</p>
+        <pre>
+            {
+                test: /\.(ttf|woff|woff2|eot)$/,
+                use: ['file-loader']
+            }
+        </pre>
+        <p>Далее импортируем наш шрифт в главный css и используем его</p>
+        <pre>
+            @import 'roboto.css';
+
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
+.red {
+    color: red;
+}
+
+h2 {
+    text-align: center;
+}
+
+p {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 14px;
+}
+        </pre>
+        <p class="red">
+            Теперь так выглядит наш вэбпак конфиг
+        </p>
+        <pre>
+            const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+
+module.exports = {
+    context: path.resolve(__dirname, 'src'),
+    entry: {
+        main: './index.js',
+        alatytics: './analytics.js'
+    },
+    output: {
+        filename: '[name].[contenthash].js',
+        path: path.resolve(__dirname, 'dist')
+    },
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: './index.html'
+        }),
+        new CleanWebpackPlugin()
+    ],
+    module: {
+        rules: [
+            {
+                test: /\.css$/,
+                use: ['style-loader', 'css-loader']
+            },
+            {
+                test: /\.(png|jpg|svg|gif)$/,
+                use: ['file-loader']
+            },
+            {
+                test: /\.(ttf|woff|woff2|eot)$/,
+                use: ['file-loader']
+            }
+        ]
+    },
+    'mode': 'development'
+}
+        </pre>
 </body>
 
 </html>
