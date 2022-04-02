@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webpack</title>
-<script defer src="main.faa1fcda4e5bad2257ad.js"></script><script defer src="alatytics.4c24e3314257623cb59d.js"></script></head>
+<script defer src="main.b8aa18f8805a9ba545dd.js"></script><script defer src="alatytics.4c24e3314257623cb59d.js"></script></head>
 
 <body>
 
@@ -502,6 +502,60 @@ module.exports = {
     'mode': 'development'
 }
         </pre>
+
+        <h2>Как подключать библиотеки</h2>
+        <p>Например normalize css</p>
+        <p>npm install normalize.css</p>
+        <p>попадает в package json в dependecis</p>
+        <p>Далее просто импортируем все это туда куда нам нужно</p>
+        <p>Здесь нампример мы импортировали в styles.css</p>
+        <p>@import '~normalize.css';</p>
+
+        <h2>Работа с xml</h2>
+        <p>Создали наш xml файл</p>
+        <p>Пишем новые правила для loadera xml в вэбпак конфиге</p>
+        <pre>
+            {
+                test: /\.xml$/,
+                use: ['xml-loader']
+            }
+        </pre>
+        <p>Устанавливаем наш loader</p>
+        <p>npm install xml-loader</p>
+        <p>Импортируем наш xml из ассетс в index.js</p>
+        <p>Выводим его в консоли все видно</p>
+        <p class="red">Точно так же работаем и с csv</p>
+
+        <h2>Resolve</h2>
+        <p>В resolve мы указываем какие расширения искать вэбпаку по умолчанию</p>
+        <pre>
+            resolve: {
+                extensions: ['.js', '.json', '.css', '.jpg']
+            },
+        </pre>
+        <p>Теперь JS файлы мы можем импортировать без расширения js</p>
+        <p>Так же в resolve есть alias</p>
+        <p>В нем мы указываем папки из которых что либо импортируется</p>
+        <pre>
+            resolve: {
+                extensions: ['.js', '.json', '.css', '.jpg'],
+                alias: {
+                    '@modules': path.resolve(__dirname, 'src/modules'),
+                    '@': path.resolve(__dirname, 'src'),
+                }
+            },
+        </pre>
+        <p>Теперь мы импортируем post.js вот так</p>
+        <pre>import Post from "@modules/Post";</pre>
+
+        <h2>Работа с сторонними библиотеками</h2>
+        <h3>jquery</h3>
+        <p> npm i -S jquery</p>
+        <p>Для того что бы её подключить мы должны просто импортировать её вот так</p>
+        <pre>import * as $ from 'jquery';</pre>
+
+        <pre>Тут выводим значение json с помощью jquery</pre>
+        <h6></h6>
 </body>
 
 </html>

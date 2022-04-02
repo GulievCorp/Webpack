@@ -12,6 +12,13 @@ module.exports = {
         filename: '[name].[contenthash].js',
         path: path.resolve(__dirname, 'dist')
     },
+    resolve: {
+        extensions: ['.js', '.json', '.css', '.jpg'],
+        alias: {
+            '@modules': path.resolve(__dirname, 'src/modules'),
+            '@': path.resolve(__dirname, 'src'),
+        }
+    },
     plugins: [
         new HtmlWebpackPlugin({
             template: './index.html'
@@ -31,6 +38,14 @@ module.exports = {
             {
                 test: /\.(ttf|woff|woff2|eot)$/,
                 use: ['file-loader']
+            },
+            {
+                test: /\.xml$/,
+                use: ['xml-loader']
+            },
+            {
+                test: /\.csv$/,
+                use: ['csv-loader']
             }
         ]
     },
