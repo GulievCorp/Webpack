@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webpack</title>
+    <link rel="stylesheet" href="favicon.ico" type="image/ico">
 </head>
 
 <body>
@@ -598,6 +599,85 @@ module.exports = {
         <h2>Как переносить статичные файлы в разные места</h2>
         <p>Для этого нам опять нужно установить библиотеку</p>
         <pre> npm i -D copy-webpack-plugin</pre>
+        <p>Далее нам нужно подключить нашу фавиконку в нашем html</p>
+        <pre>link rel="stylesheet" href="favicon.ico" type="image/ico</pre>
+        <p>Далее мы идем в webpack и подключаем там нашу библиотеку</p>
+        <pre>
+            const CopyWebpackPlugin = require('copy-webpack-plugin');
+        </pre>
+        <p>И прописываем её логику в plugins</p>
+        <pre>
+            plugins: [
+            new HtmlWebpackPlugin({
+                template: './index.html'
+            }),
+            new CleanWebpackPlugin(),
+            new CopyWebpackPlugin({
+                patterns: [
+                    {from: path.resolve(__dirname, 'src/favicon.ico'), to: path.resolve(__dirname, 'dist')}
+                ]
+                })
+        ],
+        </pre>
+
+        <h2>Более подробнее о CSS</h2>
+        <p>Допустим мы хотим что бы стили хранились в отдельном файле</p>
+        <p>Установим библиотеку</p>
+        <pre>
+            npm i -D mini-css-extract-plugin
+        </pre>
+        <p>Устанавливаем его в наш файл вэбпака</p>
+        <pre>
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+        </pre>
+        <p>И прописываем ему правила в лоадерах и плагинах</p>
+        <p>Так в правилах плагина</p>
+        <pre>
+            new MiniCssExtractPlugin({
+                filename: '[name].[contenthash].css',
+            })    
+        </pre>
+        <p>Так в лоадерах</p>
+        <pre>
+            rules: [
+            {
+                test: /\.css$/,
+                use: [{
+                    loader: MiniCssExtractPlugin.loader,
+                    options: {}
+                }, 'css-loader']
+            },
+        </pre>
+        <p>Так же в options мы передаем hmr и reloadAll</p>
+        <pre>
+            options: {
+                hrm: true,
+                reloadAll: true
+            }
+        </pre>
+        <p>HRM - hot reload module это означает что мы можем изменять определенные сущности без перезагрузки страниц
+            добавляется только при разработки</p>
+        <p>Определяем мы это переменной которую пишем выше. Она будет определять dev окружение или prod</p>
+        <pre> const isDev = process.env.NODE_ENV === 'development'; </pre>
+        <p>И после мы передаем её в options</p>
+        <pre>
+            options: {
+                hrm: isDev,
+                reloadAll: true
+            }
+        </pre>
+        <p>Тоже самое мы можем добавить и для dev сервера.</p>
+        <pre>
+            devServer: {
+                port: 4200,
+                hot: isDev
+            },
+        </pre>
+        <p>Если мы работаем в Ubuntu мы можем задать системную переменную export NODE_ENV=development</p>
+        <p>Но лучше просто воспользоваться пакетом который называется crossEnv</p>
+        <pre>
+            npm i -D cross-env
+        </pre>
 </body>
 
 </html>

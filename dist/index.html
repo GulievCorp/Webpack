@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webpack</title>
+    <link rel="stylesheet" href="favicon.ico" type="image/ico">
+<script defer src="vendors-node_modules_jquery_dist_jquery_js.b3e84ef37dd1c11bd572.js"></script><script defer src="main.185fad4bcdba7710c209.js"></script><script defer src="alatytics.d267f430a8354233b1c2.js"></script></head>
+
+<body>
+
+    <div class="conatiner">
+        <h1>Webpack</h1>
+    </div>
+
+    <p>Первым делом нужно сделать npm init</p>
+    <p>Потому нужно установить вэбпак этой командой npm install -D webpack webpack-cli</p>
+    <p>-D это значит что мы сохраняем данные зависимости только для разработки. То есть мы пользуемся вэбпаком только во
+        время разработки</p>
+    <p>Теперь в package.json есть devDependencies. И там два пакета webpack и webpack cli</p>
+
+    <h2>Настройка вэбпака</h2>
+    <p>Мы можем настраивать вэбпак через консоль</p>
+    <p>Например мы можем написать webpack ./src/index.js итд</p>
+
+    <p>Боллее правильно настраивать вэбпак через файл webpack.config.js</p>
+    <p>Webpack config js инструмент для сборки который интерптерируется как node js</p>
+
+    <p>Учитывая наше множество файлов у нас есть две точки входа index.js</p>
+
+    <h2>Что написанно в файле webpack.config.js</h2>
+    <p>entry точка входа</p>
+    <p>output это точка выхода, когда js соберет все файлы мы получим один файл который называется bundle.js</p>
+    <p>path показывает куда мы кладем весь bundle, и как называем папку. для этого мы используем метод path который
+        находится выше.</p>
+    <b>Так же что бы все заработало мы добавляем в package.json в scriptes свойство "build": "webpack"</b>
+    <br>
+    <b>И запускаем наш проект с помощью npm run build</b>
+    <p>Mode параметр режим, в нем мы указываем мод для сборки development production test итд</p>
+
+    <h2>Далее</h2>
+    <p>Webpack нам создал папку dist с файлом main.js</p>
+    <p>В нем как раз написанна наша программа, но она минифицированна.</p>
+    <p>Так же вэбпак в консоли выкинул ошибку, в которой написал что в конфигурации не был установлен mode</p>
+    <p>Поэтому вэбпак собрал нам всё в моде продакшн</p>
+    <p>Теперь напишем в webpack config mode и напишем значение development</p>
+
+    <h2>Теперь</h2>
+    <p>Теперь мы можем экспортировать по дефолту и импортировать наши функции классы итд</p>
+    <p>У нас теперь есть js который собран в один файл bundle.js</p>
+    <p>Webpack соединяет все скрипты в один. Теперь мы можем не думать о порядке подключения скриптов</p>
+
+    <h2>Переносим index.html в dist</h2>
+    <p>Теперь мы переносим наш html. И он подключается всего одним скриптом bundle.js. Можно посмотреть ниже</p>
+
+    <h2>Что же делать с аналитикой ?</h2>
+    <p>Предположим что index.js, post.js это один скрипт, а analytics совершенно другой скрипт</p>
+    <p>Сейчас консоль ругается на то что мы не имеем доступа до alatytics.js</p>
+    <p>До этого мы указывали в entry одну точку входа вот так entry: './src/index.js'</p>
+    <p>Теперь мы укажем несколько точек входа с помощью обьекта в который мы поместим</p>
+    <p>main: './src/index.js',</p>
+    <p>alatytics: './src/alatytics.js'</p>
+    <p>Main и analytics являются chunk, main имеет сразу два файла, index и post и пытаются совместится в bundle </p>
+    <p>Если мы сейчас запустим вэбпак он будет ругаться</p>
+    <b>Он скажет нам о конфликте - то что несколько фрагментов отправляют активы в файл с одним и тем же именем
+        bundle.js</b>
+    <br>
+    <b>Error: Conflict: Multiple chunks emit assets to the same filename bundle.js (chunks main and alatytics</b>
+    <p>В этом случае мы можем использовать патерны имен, в output</p>
+    <p>output: {</p>
+    <p>filename: '[name].bundle.js',</p>
+    <p>path: path.resolve(__dirname, 'dist')</p>
+    <p>},</p>
+    <p>Именно в filename мы указали перед bundle [name] который является динамическим.</p>
+    <br>
+    <b>Теперь если мы запустим Webpack сгенируется два файла main.bundle.js и alatytics.bundle.js</b>
+    <p>Теперь подключаем наши два файла, main.bundle js снизу, а analytics.bundle сверху</p>
+
+    <h2>Что имеем сейчас</h2>
+    <pre>
+const path = require('path');
+
+module.exports = {
+    entry: {
+        main: './src/index.js',
+        alatytics: './src/analytics.js'
+    },
+    output: {
+        filename: '[name].bundle.js',
+        path: path.resolve(__dirname, 'dist')
+    },
+    'mode': 'development'
+}
+    </pre>
+    <ul>
+        <li>У нас есть режим разработки</li>
+        <li>Мы имеем две точки входа в entry</li>
+        <li>Они собираются в единый файл с фиксированным значением в output</li>
+    </ul>
+
+    <h2>У нас есть некоторые проблемы</h2>
+    <p>Проблемы с кэшем например мы что то изменем в одном из файлов, и по итогу у нас будут такие же названия файлов
+        итд. Браузер закжширует все и пользователь не увидит изменений</p>
+    <p>Для этого мы будем использовать еще один патерн названия он будет динамически отоброжать еще и bundle</p>
+
+    <pre>
+const path = require('path');
+
+module.exports = {
+    entry: {
+        main: './src/index.js',
+        alatytics: './src/analytics.js'
+    },
+    output: {
+        filename: '[name].[contenthash].js',
+        path: path.resolve(__dirname, 'dist')
+    },
+    'mode': 'development'
+}
+    </pre>
+    <p>Мы обернули наше название bundle, и назвали его contenthash</p>
+    <b>Запускаем вэбпак и теперь наши файлы имеют названия alatytics.410996a2a9a1bab0063f и main.8e68f6fd050c144fcfed
+        </p>
+        <p>Теперь если мы изменим наш файл все изменения будут действовать то у файла с имзенением будет
+            создаватьсяновый файл</p>
+        <b>Из этого появляется новая проблема</b>
+        <p>Непонятно какой файл актуальный</p>
+
+        <h2>Как работать с документацией и что в ней присутствует</h2>
+        <p>В поле documentation/configuration есть разные поля настроек.</p>
+        <p>Например в filename перечислены разные патерны.</p>
+
+
+        <h2>Еще проблемы</h2>
+        <p>Так как index.html не знает в каком порядке нам подключать скрипты, мы будем ипользовать плагины.</p>
+        <p><b>Плагины это доп функционал в виде классов который мы можем добавлять к базовой конфигурации вэбпак</b></p>
+        <p>Плагины устанавливаются дополнительно к проекту</p>
+        <p>Самым популярным плагином является html-webpack-plugin</p>
+        <p>Установим его командой npm install -D html-webpack-plugin сохранив dev зависимости</p>
+
+        <h2>HTML-WEBPACK-PLUGIN</h2>
+        <p>Данный плагин позволяет вэбпаку работать с html</p>
+        <p>Подключим его через require и добавим новое свойство plugins в webpack</p>
+        <pre>
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+    entry: {
+        main: './src/index.js',
+        alatytics: './src/analytics.js'
+    },
+    output: {
+        filename: '[name].[contenthash].js',
+        path: path.resolve(__dirname, 'dist')
+    },
+    plugins: [
+        new HtmlWebpackPlugin()
+    ],
+    'mode': 'development'
+}
+    </pre>
+        <p>Теперь переносим наш index.html обратно в src. И запускаме наш проект</p>
+        <p>Таким образом у нас сгенирируется index.html в папке dist</p>
+        <p>Так же мы можем в этот класс передавать набор опций вот так</p>
+        <pre>
+        plugins: [
+        new HtmlWebpackPlugin({
+            title: 'Webpack Guliev'
+        })
+    </pre>
+        <p>Теперь в index.html измениться title</p>
+
+        <h2>Модифицируем html в папке src</h2>
+        <p>Удаляем теперь с index.html скрипты, потому что они и так подключаются нам как нужно</p>
+        <p>В нужном порядке</p>
+        <p>Для того что бы у нас на странице появился контент, в плагинах нам нужно указать свойсвто template с путем до
+            нашего index.html в src</p>
+        <pre>
+            const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+    entry: {
+        main: './src/index.js',
+        alatytics: './src/analytics.js'
+    },
+    output: {
+        filename: '[name].[contenthash].js',
+        path: path.resolve(__dirname, 'dist')
+    },
+    plugins: [
+        new HtmlWebpackPlugin({
+            title: 'Webpack Guliev',
+            template: './src/index.html'
+        })
+    ],
+    'mode': 'development'
+}
+        </pre>
+
+        <h2>Clean-webpack-plugin Как очищать папку dist от прошлых сборок</h2>
+        <p>Для этого нам потребуется установить еще один плагин Clean-webpack-plugin</p>
+        <p>npm install -D clean-webpack-plugin</p>
+        <p>Теперь добавляем его в вэбпак с помощью require</p>
+        <p>И прописываем его через webpack в плагинах</p>
+        <pre>
+            const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+
+module.exports = {
+    entry: {
+        main: './src/index.js',
+        alatytics: './src/analytics.js'
+    },
+    output: {
+        filename: '[name].[contenthash].js',
+        path: path.resolve(__dirname, 'dist')
+    },
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: './src/index.html'
+        }),
+        new CleanWebpackPlugin()
+    ],
+    'mode': 'development'
+}
+        </pre>
+        <p>Теперь при каждом npm run build лишние файлы будут удаляться</p>
+
+        <h2>Сборка проекта</h2>
+        <p>В файле package.json помимо списка зависимости есть еще свойство scripts</p>
+        <p>Мы можем модифицировать её для того что бы прописыватьк команды что бы управлять проектом например как наш
+            npm run build</p>
+        <pre>
+            "scripts": {
+                "test": "echo \"Error: no test specified\" && exit 1",
+                "build": "webpack --mode production",
+                "dev": "webpack --mode develpopment"
+              },
+        </pre>
+        <p>Теперь build собирает проект в моде продакшн и наш код не минифицирован так же в файлах нету конфигурации</p>
+        <p>Dev - собирает проект с минифицированными скриптами</p>
+
+        <h2>Контекст</h2>
+        <p>Это обычная строчка которая говорит нам где лежат все исходники нашего приложения</p>
+        <p>И теперь нам не нужно в каждом свойстве прописывать путь до файла</p>
+        <pre>
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+
+module.exports = {
+    context: path.resolve(__dirname, 'src'),
+    entry: {
+        main: './index.js',
+        alatytics: './analytics.js'
+    },
+    output: {
+        filename: '[name].[contenthash].js',
+        path: path.resolve(__dirname, 'dist')
+    },
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: './index.html'
+        }),
+        new CleanWebpackPlugin()
+    ],
+    'mode': 'development'
+}
+        </pre>
+
+        <h2>CSS and Loader</h2>
+        <p class="red">Webpack понимает только JS и JSON.</p>
+        <p>Первым делом нам нужно импортировать наш css в главный js файл</p>
+        <p>Помимо плагинов в вэбпаке есть еще и лоадеры</p>
+        <p>Лоадер добавляет вэбпаку функционал работать не только в вэбпаком, например с css</p>
+        <p>Для лоадеров мы пишем модуль moduel который принимает массив правил, в которых уже находятся обьекты с
+            правилами</p>
+        <p>В данном случае мы в обьекте пишем test с значением /\.css$/</p>
+        <p>Это значит что если Webpack встерит css файлы то он будет использовать лоадер который находится в use</p>
+        <p>В use мы в масиве перечисляем наши лоадеры которые работают слева направо.</p>
+        <p>В нашем случае он будет пропускать все из css loader в style loader</p>
+        <p>Css loader позволяет вэбпаку понимать импорты как у нас в index.js</p>
+        <p>Style loader он добавляет стили css в секцию head в html</p>
+        <br>
+        <b>Но нам нужно так же установить два этих пакета</b>
+        <br>
+        <b>npm install - style-loader css-loader</b>
+        <p>В итоге css теперь подключен</p>
+
+
+        <h2>Другие типы Loader</h2>
+        <p>Пример с нашим json который находится в assets</p>
+        <p>В вэбпаке что бы использовать его мы можем написать просто импорт нашего json</p>
+        <p>Вэбпак по умолчанию понимает это</p>
+        <pre>
+            import Post from "./Post";
+import json from '../assets/json.json';
+import './styles/styles.css';
+
+console.log(json);
+
+const post = new Post('Webpack Post Title');
+
+console.log('Post to string:', post.toString());
+        </pre>
+        <p>Теперь в консоли выводится наш json</p>
+
+        <h2>Если мы не хотим каждый раз собирать проект</h2>
+        <p>Для этого в package.json нам нужно добавить watch</p>
+        <p class="red">"watch": "webpack --mode development --watch"</p>
+        <p>Добавляем его в scripts</p>
+        <p>Он будет следить за каждым изменением</p>
+        <p>Но для этого мы должны установить watch</p>
+        <p class="red">npm install npm-watch</p>
+        <pre>
+            "scripts": {
+                "test": "echo \"Error: no test specified\" && exit 1",
+                "build": "webpack --mode production",
+                "dev": "webpack --mode development",
+                "watch": "webpack --mode development --watch"
+              },
+        </pre>
+        <p>Теперь запускаем наш проект с помощью npm run watch</p>
+        <p>И при каждом сохранении нашего файла, сайт будет обновляться</p>
+
+        <h2>Работа с картинками</h2>
+
+        <p>Импортируем нашу картинку в файл index.js</p>
+        <p>Прокидываем её в наш post.</p>
+        <p>Прописываем её в конструкторе. И делаем обращение к ней в методе stringfly</p>
+        <p class="red">Здесь мы импортировали и прокинули</p>
+        <pre>
+            import Post from "./Post";
+import json from '../assets/json.json';
+import './styles/styles.css';
+import Pepe from '../assets/pepe.jpg'
+
+console.log(json);
+
+const post = new Post('Webpack Post Title', Pepe);
+
+console.log('Post to string:', post.toString());
+        </pre>
+        <p class="red">А здесь мы уже используем нашу картинку</p>
+        <pre>
+            export default class Post {
+                constructor(title, img) {
+                    this.title = title;
+                    this.img = img
+                    this.date = new Date();
+                }
+            
+                toString() {
+                    return JSON.stringify({
+                        title: this.title,
+                        date: this.date.toJSON(),
+                        img: this.img
+                    })
+                }
+            
+                get upperCaseTitle(){
+                    return this.title.toUpperCase()
+                }
+            }
+        </pre>
+
+        <p>Но теперь вэбпак нам выдаст ошибку потому что он не знает о формате jpg</p>
+        <p>Теперь нам нужно установить новый тип лоадера который поможет нам с ним взаимодействовать</p>
+        <p class="red">npm install -D file-loader</p>
+        <p>Данный лоадер позволяет нам работать с различными файлами. И картинками</p>
+
+        <p>Теперь прописываем правила использование нашего loadera в webpack config</p>
+        <pre>
+            {
+                test: /\.(png|jpg|svg|gif)$/,
+                use: ['file-loader']
+            }
+        </pre>
+        <p class="red">А так теперь выглядит весь наш файл</p>
+        <pre>
+            const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+
+module.exports = {
+    context: path.resolve(__dirname, 'src'),
+    entry: {
+        main: './index.js',
+        alatytics: './analytics.js'
+    },
+    output: {
+        filename: '[name].[contenthash].js',
+        path: path.resolve(__dirname, 'dist')
+    },
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: './index.html'
+        }),
+        new CleanWebpackPlugin()
+    ],
+    module: {
+        rules: [
+            {
+                test: /\.css$/,
+                use: ['style-loader', 'css-loader']
+            },
+            {
+                test: /\.(png|jpg|svg|gif)$/,
+                use: ['file-loader']
+            }
+        ]
+    },
+    'mode': 'development'
+}
+        </pre>
+        <p>И вот наша картинка</p>
+        <img src="" alt="" class="pepe">
+
+        <h2>Файл лоадер и работа с шрифтами</h2>
+        <p>Скачиваем шрифт</p>
+        <p>Создаем папку Fonts в assets и кидаем туда наш шрифт</p>
+        <p>Далее создаем файл roboto.css в папке styles</p>
+        <pre>
+            @font-face {
+                font-family: 'Roboto';
+                src: url('../../assets//Fonts/Roboto-Regular.ttf') format('truetype');
+            }
+        </pre>
+        <p>Пишем такой css стиль</p>
+        <p>Далее пишем правила для нашего вэбпака</p>
+        <pre>
+            {
+                test: /\.(ttf|woff|woff2|eot)$/,
+                use: ['file-loader']
+            }
+        </pre>
+        <p>Далее импортируем наш шрифт в главный css и используем его</p>
+        <pre>
+            @import 'roboto.css';
+
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
+.red {
+    color: red;
+}
+
+h2 {
+    text-align: center;
+}
+
+p {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 14px;
+}
+        </pre>
+        <p class="red">
+            Теперь так выглядит наш вэбпак конфиг
+        </p>
+        <pre>
+            const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+
+module.exports = {
+    context: path.resolve(__dirname, 'src'),
+    entry: {
+        main: './index.js',
+        alatytics: './analytics.js'
+    },
+    output: {
+        filename: '[name].[contenthash].js',
+        path: path.resolve(__dirname, 'dist')
+    },
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: './index.html'
+        }),
+        new CleanWebpackPlugin()
+    ],
+    module: {
+        rules: [
+            {
+                test: /\.css$/,
+                use: ['style-loader', 'css-loader']
+            },
+            {
+                test: /\.(png|jpg|svg|gif)$/,
+                use: ['file-loader']
+            },
+            {
+                test: /\.(ttf|woff|woff2|eot)$/,
+                use: ['file-loader']
+            }
+        ]
+    },
+    'mode': 'development'
+}
+        </pre>
+
+        <h2>Как подключать библиотеки</h2>
+        <p>Например normalize css</p>
+        <p>npm install normalize.css</p>
+        <p>попадает в package json в dependecis</p>
+        <p>Далее просто импортируем все это туда куда нам нужно</p>
+        <p>Здесь нампример мы импортировали в styles.css</p>
+        <p>@import '~normalize.css';</p>
+
+        <h2>Работа с xml</h2>
+        <p>Создали наш xml файл</p>
+        <p>Пишем новые правила для loadera xml в вэбпак конфиге</p>
+        <pre>
+            {
+                test: /\.xml$/,
+                use: ['xml-loader']
+            }
+        </pre>
+        <p>Устанавливаем наш loader</p>
+        <p>npm install xml-loader</p>
+        <p>Импортируем наш xml из ассетс в index.js</p>
+        <p>Выводим его в консоли все видно</p>
+        <p class="red">Точно так же работаем и с csv</p>
+
+        <h2>Resolve</h2>
+        <p>В resolve мы указываем какие расширения искать вэбпаку по умолчанию</p>
+        <pre>
+            resolve: {
+                extensions: ['.js', '.json', '.css', '.jpg']
+            },
+        </pre>
+        <p>Теперь JS файлы мы можем импортировать без расширения js</p>
+        <p>Так же в resolve есть alias</p>
+        <p>В нем мы указываем папки из которых что либо импортируется</p>
+        <pre>
+            resolve: {
+                extensions: ['.js', '.json', '.css', '.jpg'],
+                alias: {
+                    '@modules': path.resolve(__dirname, 'src/modules'),
+                    '@': path.resolve(__dirname, 'src'),
+                }
+            },
+        </pre>
+        <p>Теперь мы импортируем post.js вот так</p>
+        <pre>import Post from "@modules/Post";</pre>
+
+        <h2>Работа с сторонними библиотеками</h2>
+        <h3>jquery</h3>
+        <p> npm i -S jquery</p>
+        <p>Для того что бы её подключить мы должны просто импортировать её вот так</p>
+        <pre>import * as $ from 'jquery';</pre>
+
+        <pre>Тут выводим значение json с помощью jquery</pre>
+        <h6></h6>
+
+        <h2>Как сделать файлы меньше</h2>
+        <p>Для этого нам нужно добавить в webpack параметр optimization</p>
+        <pre>
+            optimization: {
+                splitChunks: {
+                    chunks: 'all',
+                }
+            },
+        </pre>
+        <p>Таким образом он создаст еще два файла vendor в которых будет хранится основная чатсь нашего кода</p>
+        <p>Теперь импорт библиотеки jquery будет использоваться только один раз, а не два как было до этого</p>
+
+
+        <h1>DEV SERVER</h1>
+        <p>Если мы что то изменяем нам нужно пересобирать весь проект</p>
+        <p>Мы можем использовать Watch но для этого нам нужно обновлять страницу</p>
+        <p>Когда мы с реактом работаем, страница сама перезагружается</p>
+        <p>Для того что бы все работало так же нам нужно установить Dev Server</p>
+        <pre>npm install -D webpack-dev-server</pre>
+        <p>Так же для него придется написать настройки в webpack</p>
+        <pre>
+            devServer: {
+                port: 4200
+            },
+        </pre>
+        <p>Тут мы пишем просто порт на котором все запускается</p>
+        <p>Так же теперь мы пишем настройку для него в packageJson</p>
+        <pre>
+            "scripts": {
+                "test": "echo \"Error: no test specified\" && exit 1",
+                "build": "webpack --mode production",
+                "dev": "webpack --mode development",
+                "watch": "webpack --mode development --watch",
+                "start": "webpack-dev-server --mode development --open"
+              },
+        </pre>
+        <p>Webpack dev server используется только во время разработки</p>
+
+        <h2>Как переносить статичные файлы в разные места</h2>
+        <p>Для этого нам опять нужно установить библиотеку</p>
+        <pre> npm i -D copy-webpack-plugin</pre>
+        <p>Далее нам нужно подключить нашу фавиконку в нашем html</p>
+        <pre>link rel="stylesheet" href="favicon.ico" type="image/ico</pre>
+        <p>Далее мы идем в webpack и подключаем там нашу библиотеку</p>
+        <pre>
+            const CopyWebpackPlugin = require('copy-webpack-plugin');
+        </pre>
+        <p>И прописываем её логику в plugins</p>
+        <pre>
+            plugins: [
+            new HtmlWebpackPlugin({
+                template: './index.html'
+            }),
+            new CleanWebpackPlugin(),
+            new CopyWebpackPlugin({
+                patterns: [
+                    {from: path.resolve(__dirname, 'src/favicon.ico'), to: path.resolve(__dirname, 'dist')}
+                ]
+                })
+        ],
+        </pre>
+
+        <h2>Более подробнее о CSS</h2>
+        <p>Допустим мы хотим что бы стили хранились в отдельном файле</p>
+        <p>Установим библиотеку</p>
+        <pre>
+            npm i -D mini-css-extract-plugin
+        </pre>
+        <p>Устанавливаем его в наш файл вэбпака</p>
+        <pre>
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+        </pre>
+        <p>И прописываем ему правила в лоадерах и плагинах</p>
+        <p>Так в правилах плагина</p>
+        <pre>
+            new MiniCssExtractPlugin({
+                filename: '[name].[contenthash].css',
+            })    
+        </pre>
+        <p>Так в лоадерах</p>
+        <pre>
+            rules: [
+            {
+                test: /\.css$/,
+                use: [{
+                    loader: MiniCssExtractPlugin.loader,
+                    options: {}
+                }, 'css-loader']
+            },
+        </pre>
+        <p>Так же в options мы передаем hmr и reloadAll</p>
+        <pre>
+            options: {
+                hrm: true,
+                reloadAll: true
+            }
+        </pre>
+        <p>HRM - hot reload module это означает что мы можем изменять определенные сущности без перезагрузки страниц
+            добавляется только при разработки</p>
+        <p>Определяем мы это переменной которую пишем выше. Она будет определять dev окружение или prod</p>
+        <pre> const isDev = process.env.NODE_ENV === 'development'; </pre>
+        <p>И после мы передаем её в options</p>
+        <pre>
+            options: {
+                hrm: isDev,
+                reloadAll: true
+            }
+        </pre>
+        <p>Тоже самое мы можем добавить и для dev сервера.</p>
+        <pre>
+            devServer: {
+                port: 4200,
+                hot: isDev
+            },
+        </pre>
+        <p>Если мы работаем в Ubuntu мы можем задать системную переменную export NODE_ENV=development</p>
+        <p>Но лучше просто воспользоваться пакетом который называется crossEnv</p>
+        <pre>
+            npm i -D cross-env
+        </pre>
+</body>
+
+</html>
