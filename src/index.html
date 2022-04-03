@@ -556,6 +556,48 @@ module.exports = {
 
         <pre>Тут выводим значение json с помощью jquery</pre>
         <h6></h6>
+
+        <h2>Как сделать файлы меньше</h2>
+        <p>Для этого нам нужно добавить в webpack параметр optimization</p>
+        <pre>
+            optimization: {
+                splitChunks: {
+                    chunks: 'all',
+                }
+            },
+        </pre>
+        <p>Таким образом он создаст еще два файла vendor в которых будет хранится основная чатсь нашего кода</p>
+        <p>Теперь импорт библиотеки jquery будет использоваться только один раз, а не два как было до этого</p>
+
+
+        <h1>DEV SERVER</h1>
+        <p>Если мы что то изменяем нам нужно пересобирать весь проект</p>
+        <p>Мы можем использовать Watch но для этого нам нужно обновлять страницу</p>
+        <p>Когда мы с реактом работаем, страница сама перезагружается</p>
+        <p>Для того что бы все работало так же нам нужно установить Dev Server</p>
+        <pre>npm install -D webpack-dev-server</pre>
+        <p>Так же для него придется написать настройки в webpack</p>
+        <pre>
+            devServer: {
+                port: 4200
+            },
+        </pre>
+        <p>Тут мы пишем просто порт на котором все запускается</p>
+        <p>Так же теперь мы пишем настройку для него в packageJson</p>
+        <pre>
+            "scripts": {
+                "test": "echo \"Error: no test specified\" && exit 1",
+                "build": "webpack --mode production",
+                "dev": "webpack --mode development",
+                "watch": "webpack --mode development --watch",
+                "start": "webpack-dev-server --mode development --open"
+              },
+        </pre>
+        <p>Webpack dev server используется только во время разработки</p>
+
+        <h2>Как переносить статичные файлы в разные места</h2>
+        <p>Для этого нам опять нужно установить библиотеку</p>
+        <pre> npm i -D copy-webpack-plugin</pre>
 </body>
 
 </html>
